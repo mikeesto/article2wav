@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>article2wav</title>
+  </head>
+  <body>
+    <h1>article2wav</h1>
+    <p>{{job_id}}</p>
+    <p id="status"></p>
+    <div id="download"></div>
+  </body>
+
+  <script>
+    const jobId = {{ job_id | tojson }};
+    const statusParagraph = document.querySelector("#status");
+    const downloadDiv = document.querySelector("#download");
+
+    async function poll() {
+      const response = await fetch(`/jobs/${jobId}`);
+      const { status } = await response.json();
+
+      statusParagraph.textContent = status;
+
+      if (status === "done" || status === "error") {
+        clearInterval(interval);
+
+        if (status === "done") {
+          downloadDiv.innerHTML = `<a href="/jobs/${jobId}/download">Download</a>`;
+        }
+      }
+    }
+
+    poll();
+
+    const interval = setInterval(poll, 20000);
+  </script>
+</html>
