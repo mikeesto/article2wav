@@ -50,7 +50,7 @@ def split_article(text, max_words=1400):
     return chunks
 
 
-def generate_wav(chunks, job_id):
+def generate_wav(chunks, job_id, on_progress):
     # Send to gemini for tts
     client = genai.Client()
     out = None
@@ -90,19 +90,27 @@ def generate_wav(chunks, job_id):
                 while frames := w.readframes(48000):
                     out.writeframes(frames)
 
+            if index + 1 < len(chunks):
+                on_progress(index + 1, len(chunks))
+
             del response, data
     finally:
         if out is not None:
             out.close()
 
 
-def convert_article(url, job_id):
+def convert_article(url, job_id, on_progress):
     print(f"Fetching {url}")
 
     downloaded = fetch_url(url)
     article = extract(downloaded)
+
+    if not article:
+        raise ValueError("No article text found")
+
     chunks = split_article(article)
+    on_progress(0, len(chunks))
 
     print(f"Requests required: {len(chunks)}")
 
-    generate_wav(chunks, job_id)
+    # generate_wav(chunks, job_id, on_progress=on_progress)

@@ -4,36 +4,315 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>article2wav</title>
-  </head>
-  <body>
-    <h1>article2wav</h1>
-    <p>{{job_id}}</p>
-    <p id="status"></p>
-    <div id="download"></div>
-  </body>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
 
-  <script>
-    const jobId = {{ job_id | tojson }};
-    const statusParagraph = document.querySelector("#status");
-    const downloadDiv = document.querySelector("#download");
+    <style>
+      :root {
+        font-family: "DM Sans", sans-serif;
+        color: #252522;
+        background: #f7f7f2;
+        font-synthesis: none;
+      }
 
-    async function poll() {
-      const response = await fetch(`/jobs/${jobId}`);
-      const { status } = await response.json();
+      * {
+        box-sizing: border-box;
+      }
 
-      statusParagraph.textContent = status;
+      body {
+        margin: 0;
+        padding: 32px;
+      }
 
-      if (status === "done" || status === "error") {
-        clearInterval(interval);
+      .page {
+        min-height: calc(100svh - 64px);
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 48px 24px 36px;
+      }
 
-        if (status === "done") {
-          downloadDiv.innerHTML = `<a href="/jobs/${jobId}/download">Download</a>`;
+      header {
+        text-align: center;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(28px, 4vw, 36px);
+        font-weight: 600;
+        letter-spacing: -1.8px;
+      }
+
+      .tagline {
+        max-width: 30ch;
+        margin: 12px auto 0;
+        color: #68685f;
+        font-size: clamp(15px, 2vw, 17px);
+        font-weight: 400;
+        line-height: 1.6;
+        text-wrap: balance;
+      }
+
+      main {
+        width: min(100%, 640px);
+        margin-top: clamp(72px, 8vh, 96px);
+        text-align: center;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 42px;
+      }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      input,
+      button {
+        font: inherit;
+        border-radius: 5px;
+      }
+
+      input {
+        width: 100%;
+        min-height: 64px;
+        padding: 18px 24px;
+        border: 1px solid #66665d;
+        background: transparent;
+        color: inherit;
+        text-align: center;
+        font-size: 17px;
+      }
+
+      input::placeholder {
+        color: #77776e;
+        opacity: 1;
+      }
+
+      button {
+        width: min(100%, 280px);
+        min-height: 56px;
+        padding: 16px 24px;
+        border: 1px solid #252522;
+        background: #252522;
+        color: #f7f7f2;
+        font-weight: 500;
+        cursor: pointer;
+        transition:
+          background 160ms ease,
+          border-color 160ms ease;
+      }
+
+      button:hover {
+        background: #45453e;
+        border-color: #45453e;
+      }
+
+      :focus-visible {
+        outline: 2px solid #737366;
+        outline-offset: 4px;
+      }
+
+      footer {
+        margin-top: auto;
+        padding-top: 80px;
+        font-size: 15px;
+        font-weight: 500;
+      }
+
+      footer a {
+        text-decoration: none;
+        color: black;
+      }
+
+      footer a:hover {
+        color: blue;
+      }
+
+      @media (max-width: 540px) {
+        body {
+          padding: 16px;
+        }
+        .page {
+          min-height: calc(100svh - 32px);
+          padding: 40px 20px 28px;
+        }
+        main {
+          margin-top: 80px;
+        }
+        input {
+          padding-inline: 12px;
+          font-size: 16px;
         }
       }
-    }
 
-    poll();
+      .home-link {
+        color: inherit;
+        text-decoration: none;
+      }
 
-    const interval = setInterval(poll, 20000);
-  </script>
+      .status-mark {
+        width: 28px;
+        height: 28px;
+        margin: 0 auto 24px;
+        border: 2px solid #deded5;
+        border-top-color: #252522;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      .status-mark.settled {
+        animation: none;
+        border-color: #68685f;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 500;
+        letter-spacing: -0.5px;
+      }
+
+      .status-detail {
+        margin: 24px 0 0;
+        color: #68685f;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .download-link {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: min(100%, 280px);
+        min-height: 56px;
+        padding: 16px 24px;
+        border: 1px solid #252522;
+        border-radius: 5px;
+        background: #252522;
+        color: #f7f7f2;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background 160ms ease;
+      }
+
+      .download-link:hover {
+        background: #45453e;
+      }
+
+      .back-link {
+        display: inline-block;
+        margin-top: 28px;
+        color: #68685f;
+        text-underline-offset: 4px;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      .back-link:hover {
+        color: #252522;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .status-mark {
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="page">
+      <header>
+        <h1><a class="home-link" href="/">article2wav</a></h1>
+        <p class="tagline">Paste a link and listen to it.</p>
+      </header>
+      <main>
+        <div class="status-mark" aria-hidden="true"></div>
+        <div role="status" aria-live="polite" aria-atomic="true">
+          <h2 id="status">0%</h2>
+          <p class="status-detail" id="status-detail">
+            This may take a few minutes. Please keep this page open.
+          </p>
+        </div>
+        <div id="download" hidden></div>
+        <a class="back-link" href="/" hidden>Convert another article</a>
+      </main>
+      <footer><a href="https://mikeesto.com">@mikeesto</a></footer>
+    </div>
+
+    <script>
+      const jobId = {{ job_id | tojson }};
+      const statusParagraph = document.querySelector("#status");
+      const statusDetail = document.querySelector("#status-detail");
+      const statusMark = document.querySelector(".status-mark");
+      const backLink = document.querySelector(".back-link");
+      const downloadDiv = document.querySelector("#download");
+
+      async function poll() {
+        try {
+          const response = await fetch(`/jobs/${jobId}`);
+
+          if (!response.ok) {
+            throw new Error("Status request failed");
+          }
+
+          const { status, progress } = await response.json();
+          statusParagraph.textContent = `${progress}%`;
+
+          if (["done", "error", "unknown"].includes(status)) {
+            statusMark.hidden = true;
+            statusDetail.hidden = true;
+
+            if (status === "done") {
+              statusParagraph.hidden = true;
+              const link = document.createElement("a");
+              link.href = `/jobs/${jobId}/download`;
+              link.className = "download-link";
+              link.textContent = "Download audio";
+              downloadDiv.replaceChildren(link);
+              downloadDiv.hidden = false;
+              backLink.hidden = false;
+            } else {
+              statusParagraph.textContent = status === "error"
+                ? "We couldn't create your audio. Please try again."
+                : "This job could not be found.";
+            }
+
+            return;
+          }
+        } catch (error) {
+          statusParagraph.textContent = "Reconnecting…";
+          console.log(error);
+        }
+
+        setTimeout(poll, 1000);
+      }
+
+      poll();
+    </script>
+  </body>
 </html>

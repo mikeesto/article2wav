@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, send_file
 import uuid
 from process import convert_article
 import threading
+import time
 
 app = Flask(__name__)
 
@@ -14,27 +15,35 @@ def home():
 
 
 def run_job(job_id, url):
-    jobs[job_id] = "running"
+    jobs[job_id] = {"status": "running", "progress": 0}
+
+    def update_progress(completed, total):
+        jobs[job_id] = {
+            "status": "running",
+            "progress": completed * 100 // total,
+        }
+
     try:
-        convert_article(url, job_id)
-        jobs[job_id] = "done"
+        convert_article(url, job_id, on_progress=update_progress)
+        time.sleep(5)
+        jobs[job_id] = {"status": "done", "progress": 100}
     except Exception:
         app.logger.exception("Error generating audio")
-        jobs[job_id] = "error"
+        jobs[job_id] = {"status": "error", "progress": jobs[job_id]["progress"]}
 
 
 @app.route("/jobs", methods=["POST"])
 def submit_job():
     url = request.form.get("url")
     job_id = uuid.uuid4().hex
-    jobs[job_id] = "queued"
+    jobs[job_id] = {"status": "queued", "progress": 0}
     threading.Thread(target=run_job, args=(job_id, url), daemon=True).start()
     return render_template("jobs.html", job_id=job_id)
 
 
 @app.route("/jobs/<job_id>")
 def job_status(job_id):
-    return {"status": jobs.get(job_id, "unknown")}
+    return jobs.get(job_id, {"status": "unknown", "progress": 0})
 
 
 @app.route("/jobs/<job_id>/download")
