@@ -4,13 +4,174 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>article2wav</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        font-family: "DM Sans", sans-serif;
+        color: #252522;
+        background: #f7f7f2;
+        font-synthesis: none;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 32px;
+      }
+
+      .page {
+        min-height: calc(100svh - 64px);
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 56px 24px 36px;
+      }
+
+      header {
+        text-align: center;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(28px, 4vw, 36px);
+        font-weight: 600;
+        letter-spacing: -1.8px;
+      }
+
+      .tagline {
+        max-width: 30ch;
+        margin: 12px auto 0;
+        color: #68685f;
+        font-size: clamp(15px, 2vw, 17px);
+        font-weight: 400;
+        line-height: 1.6;
+        text-wrap: balance;
+      }
+
+      main {
+        width: min(100%, 640px);
+        margin-top: clamp(72px, 8vh, 96px);
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 42px;
+      }
+
+      input,
+      button {
+        font: inherit;
+        border-radius: 5px;
+      }
+
+      input {
+        width: 100%;
+        min-height: 64px;
+        padding: 18px 24px;
+        border: 1px solid #66665d;
+        background: transparent;
+        color: inherit;
+        text-align: center;
+        font-size: 17px;
+      }
+
+      input::placeholder {
+        color: #77776e;
+        opacity: 1;
+      }
+
+      button {
+        width: min(100%, 280px);
+        min-height: 56px;
+        padding: 16px 24px;
+        border: 1px solid #252522;
+        background: #252522;
+        color: #f7f7f2;
+        font-weight: 500;
+        cursor: pointer;
+        transition:
+          background 160ms ease,
+          border-color 160ms ease;
+      }
+
+      button:hover {
+        background: #45453e;
+        border-color: #45453e;
+      }
+
+      :focus-visible {
+        outline: 2px solid #737366;
+        outline-offset: 4px;
+      }
+
+      footer {
+        margin-top: auto;
+        padding-top: 80px;
+        font-size: 15px;
+        font-weight: 500;
+      }
+
+      footer a {
+        text-decoration: none;
+        color: black;
+      }
+
+      footer a:hover {
+        color: blue;
+      }
+
+      @media (max-width: 540px) {
+        body {
+          padding: 16px;
+        }
+
+        .page {
+          min-height: calc(100svh - 32px);
+          padding: 40px 20px 28px;
+        }
+
+        main {
+          margin-top: 80px;
+        }
+
+        input {
+          padding-inline: 12px;
+          font-size: 16px;
+        }
+      }
+    </style>
   </head>
   <body>
-    <h1>article2wav</h1>
-    <form method="POST" action="/jobs">
-      <label for="url">Enter a URL</label>
-      <input type="text" id="url" name="url" />
-      <button type="submit">Submit</button>
-    </form>
+    <div class="page">
+      <header>
+        <h1>article2wav</h1>
+        <p class="tagline">Paste a link. Listen to it.</p>
+      </header>
+      <main>
+        <form method="POST" action="/jobs">
+          <input
+            type="url"
+            id="url"
+            name="url"
+            placeholder="Enter an article URL"
+            autocomplete="url"
+            required
+          />
+          <button type="submit">Generate</button>
+        </form>
+      </main>
+      <footer><a href="https://mikeesto.com">@mikeesto</a></footer>
+    </div>
   </body>
 </html>
