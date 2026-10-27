@@ -2,3 +2,4 @@ trafilatura
 google-genai
 python-dotenv
 flask
+gunicorn
