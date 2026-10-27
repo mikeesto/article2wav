@@ -258,6 +258,12 @@
             This may take a few minutes. Please keep this page open.
           </p>
         </div>
+        <p
+          class="status-detail"
+          id="truncation-notice"
+          role="status"
+          hidden
+        ></p>
         <div id="download" hidden></div>
         <a class="back-link" href="/" hidden>Convert another article</a>
       </main>
@@ -270,6 +276,7 @@
       const statusDetail = document.querySelector("#status-detail");
       const statusMark = document.querySelector(".status-mark");
       const backLink = document.querySelector(".back-link");
+      const truncationNotice = document.querySelector("#truncation-notice");
       const downloadDiv = document.querySelector("#download");
 
       async function poll() {
@@ -280,7 +287,15 @@
             throw new Error("Status request failed");
           }
 
-          const { status, progress } = await response.json();
+          const { status, progress, processed_chunks, total_chunks } = await response.json();
+
+          if (total_chunks > processed_chunks) {
+            truncationNotice.hidden = false;
+            truncationNotice.textContent = status === "done"
+              ? `Your audio includes the first ${processed_chunks} of ${total_chunks} sections.`
+              : `This article is long, so only the first part will be converted (${processed_chunks} of ${total_chunks} sections).`;
+          }
+
           statusParagraph.textContent = `${progress}%`;
 
           if (["done", "error", "unknown"].includes(status)) {

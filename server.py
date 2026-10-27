@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, send_file
 import uuid
 from process import convert_article
 import threading
-import time
 
 app = Flask(__name__)
 
@@ -17,19 +16,20 @@ def home():
 def run_job(job_id, url):
     jobs[job_id] = {"status": "running", "progress": 0}
 
-    def update_progress(completed, total):
+    def update_progress(completed, total, total_chunks):
         jobs[job_id] = {
             "status": "running",
             "progress": completed * 100 // total,
+            "processed_chunks": total,
+            "total_chunks": total_chunks,
         }
 
     try:
         convert_article(url, job_id, on_progress=update_progress)
-        time.sleep(5)
-        jobs[job_id] = {"status": "done", "progress": 100}
+        jobs[job_id].update(status="done", progress=100)
     except Exception:
         app.logger.exception("Error generating audio")
-        jobs[job_id] = {"status": "error", "progress": jobs[job_id]["progress"]}
+        jobs[job_id]["status"] = "error"
 
 
 @app.route("/jobs", methods=["POST"])
